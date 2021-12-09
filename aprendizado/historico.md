@@ -338,3 +338,41 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 Esse código carrega o template chamado polls/index.html e passa um contexto para ele. O contexto é um dicionário mapeando nomes de variáveis ​​para objetos Python.
+
+A função get_object_or_404() recebe um modelo do Django como primeiro argumento e uma quantidade arbitrária de argumentos nomeados, que ele passa para a função do módulo get(). E levanta uma exceção Http404 se o objeto não existir.
+
+Existe também a função get_list_or_404(), que trabalha da mesma forma que get_object_or_404() – com a diferença de que ela usa filter() ao invés de get(). Ela levanta Http404 se a lista estiver vazia.
+
+para que o Django saiba qual view da aplicação será criada para a url ao usar a tag de template deve-se adicionar namespaces a seu URLconf. No arquivo polls/urls.py, continue e adicione um app_name para configurar o namespace da aplicação.
+Dentro de polls/urls.py:
+app_name = 'polls'
+
+Agora mudo seu template``polls/index.html`` de:
+
+polls/templates/polls/index.html para apontar para a view de detalhes d namespace:
+
+<li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+
+## Views genéricas
+
+Antes, não genéricas, estava assim:
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    # para acessar /polls/5
+    path('<int:question_id>/', views.detail, name='detail'),
+    # para acessar /polls/5/results
+    path('<int:question_id>/results', views.results, name='results'),
+    # para acessar /polls/5/vote
+    path('<int:question_id>/vote', views.vote, name='vote'),
+]
+
+
+Agora, usando Views genéricas, ficou assim:
+
+urlpatterns = [
+    path('', views.IndexView.as_view(), name='index'),
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+    path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+]
