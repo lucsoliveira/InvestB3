@@ -18,6 +18,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # sistema de autenticação
+    path('accounts/', include('django.contrib.auth.urls')),
     # api REST
     path('api/', include('api.urls', namespace='api'))
 
