@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import sys
 import os
+import environ
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from pathlib import Path
@@ -138,5 +139,29 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
+
+# API Config
+# obtenha uma chave (key) freemium em: https://rapidapi.com/apidojo/api/yh-finance/
+URL_SERVER_API = env('URL_SERVER_API')
+HEADERS_API = {
+    'x-rapidapi-host': URL_SERVER_API,
+    'x-rapidapi-key': env('URL_SERVER_API_KEY')
+}
+
 # necessário para o processamento em background
 SCHEDULER = BackgroundScheduler()
+
+# necessário para o envio de emails
+# para printar o email no console: EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# para usar dessa forma, é necessário ativar o "less secure app access" de seu provedor de email
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_USE_SSL = env('EMAIL_USE_SSL')
+DEFAULT_FROM_EMAIL = 'default from email'
