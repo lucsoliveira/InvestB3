@@ -9,9 +9,14 @@ from .forms import RemoveAlertForm, AddAlertForm, UpdateAlertForm
 
 from .models import Alert, User
 
+from django.conf import settings
+from notificator.jobs import notificator
+
 
 def index(request):
     """View da pagina alertas"""
+
+    # get all user's alert
     context = {
         'user': request.user,
     }
@@ -34,9 +39,21 @@ def add(request):
 
             if request.user:
 
-                f = Alert(user_id=request.user.id, code=code,
+                # create a job
+                settings.SCHEDULER.add_job(
+                    notificator, 'interval', minutes=interval_notify, args=[''])
+
+                all_jobs = settings.SCHEDULER.get_jobs()
+
+                last_job = all_jobs[len(all_jobs) - 1].id
+                print('Job adicionado com sucesso!', all_jobs)
+
+                a = Alert(uid_scheduler=last_job, user_id=request.user.id, code=code,
                           interval_notify=interval_notify, higher_limit=higher_limit, lower_limit=lower_limit, sync=0)
-                f.save()
+                a.save()
+
+                # update the job with the parameters of alert
+                all_jobs[len(all_jobs) - 1].modify(args=[a])
 
                 return HttpResponseRedirect('/')
 
@@ -66,16 +83,28 @@ def update(request):
 
             if request.user:
 
-                f = Alert.objects.get(
+                a = Alert.objects.get(
                     user_id=request.user.id, id=id_alert)
 
-                if f:
-                    f.code = code
-                    f.interval_notify = interval_notify
-                    f.higher_limit = higher_limit
-                    f.lower_limit = lower_limit
+                if a:
 
-                    f.save()
+                    a.code = code
+                    a.interval_notify = interval_notify
+                    a.higher_limit = higher_limit
+                    a.lower_limit = lower_limit
+
+                    a.save()
+
+                    # change the time os schedule job
+                    settings.SCHEDULER.reschedule_job(
+                        a.uid_scheduler, trigger='cron', minute='*/' + str(a.interval_notify))
+
+                    settings.SCHEDULER.modify_job(a.uid_scheduler, args=[a])
+
+                    # update the job with the parameters of alert
+
+                    print('Job #' + str(a.uid_scheduler) +
+                          ' atualizado com sucesso.')
 
                     return HttpResponseRedirect('/')
 
@@ -100,9 +129,20 @@ def remove(request):
 
             if request.user:
 
-                Alert.objects.filter(
-                    user=request.user.id, id=id_alert).delete()
-                return HttpResponseRedirect('/')
+                # retrive the alert
+                a = Alert.objects.filter(
+                    user=request.user.id, id=id_alert)
+
+                # delete the job
+                settings.SCHEDULER.remove_job(a[0].uid_scheduler)
+                print('Job removido ' + a[0].uid_scheduler + ' com sucesso.')
+                # delete de alert object
+                a.delete()
+                print('Alerta removido com sucesso.')
+
+                # list all jobs in console
+                print('All jobs: ', settings.SCHEDULER.get_jobs())
+                return HttpResponseRedirect('/?msg=delete-sucess')
 
             else:
                 return HttpResponseRedirect('/')

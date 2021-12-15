@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 class Alert(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
     code = models.CharField(max_length=8)
+    uid_scheduler = models.CharField(default='', max_length=255)
     interval_notify = models.IntegerField()
     higher_limit = models.FloatField()
     lower_limit = models.FloatField()
