@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-from pathlib import Path
 import sys
 import os
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +46,7 @@ INSTALLED_APPS = [
     'alert.apps.AlertConfig',  # necessário para o Alert
     'stock.apps.StockConfig',  # definição do app Stock
     'market.apps.MarketConfig',  # definição do app Stock
+    'notificator.apps.NotificatorConfig',  # definição do Notificator
 ]
 
 MIDDLEWARE = [
@@ -133,3 +137,6 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# necessário para o processamento em background
+SCHEDULER = BackgroundScheduler()
