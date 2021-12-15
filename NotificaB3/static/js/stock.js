@@ -27,6 +27,7 @@ function getAllQuoteInformation(code) {
             let res = response.quoteResponse.result[0]
 
             quote.push({ name: "regularMarketPreviousClose", value: res.regularMarketPreviousClose })
+            quote.push({ name: "regularMarketPrice", value: res.regularMarketPrice })
             quote.push({ name: "bid", value: res.bid })
             quote.push({ name: "ask", value: res.ask })
             quote.push({ name: "regularMarketDayRange", value: res.regularMarketDayRange })

@@ -1,0 +1,136 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+
+
+{% if user.is_authenticated %}
+<!-- segment search-->
+<div class="ui container segment">
+    <h2 class="ui left  header">Buscar Ação</h2>
+    <!--search form-->
+    <form method="get" action="/stock">
+        <div class="ui aligned search">
+            <div class="ui icon input fluid">
+                <input class="prompt" name="q" type="text" placeholder="Digite o nome da ação...">
+                <i class="search icon"></i>
+            </div>
+            <div class="results"></div>
+        </div>
+    </form>
+    <!--end search form-->
+</div>
+
+<!--end segment search-->
+{% endif %}
+
+<!--segment my favorites-->
+<div class="ui container segment">
+
+    <h2 class="ui left  header">Meus Alertas</h2>
+
+
+
+    {% if user.is_authenticated %}
+
+    <!--lodaer-->
+    <div class="ui active inverted dimmer" id="loader-alerts">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
+
+    <!--table my favorites-->
+    <table class="ui celled padded table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Valor Atual (BRL)</th>
+                <th>Limite Inferior (BRL)</th>
+                <th>Limite Superior (BRL)</th>
+                <th>Intervalo de Notificação (m)</th>
+                <th>Opções</th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for item in favorites %}
+            <tr>
+                <td>
+                    <h3 class="ui center aligned header"> {{ item.code }}
+                    </h3>
+                </td>
+                <td>xx</td>
+                <td>{{ item.lower_limit }}</td>
+                <td>{{ item.higher_limit }}</td>
+                <td>{{ item.interval_notify }}</td>
+
+                <td>
+                    <center>
+                        <div class="ui icon buttons">
+
+                            <a href="../stock/?q={{ item.code }}">
+                                <button class="ui button"><i class="edit icon"></i></button>
+                            </a>
+
+                            <button class="ui button"><i class="delete icon"></i></button>
+
+                        </div>
+                    </center>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+        <!---->
+        <tfoot>
+            <tr>
+                <th colspan="6">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+    <!--end table my favorites-->
+
+
+
+    {% else %}
+    <!--message-->
+    <div class="ui warning message">
+        <!--<i class="close icon"></i>-->
+        <div class="header">
+            É necessário estar logado
+        </div>
+        É necessário entrar com sua conta para poder adicionar favoritos e receber notificações via email. Clique <a
+            href="{% url 'login'%}?next={{request.path}}">aqui</a>
+        para logar ou criar uma conta.
+    </div>
+    <!--end message-->
+
+    {% endif %}
+
+</div>
+<!--end segment my favorites-->
+<script type="text/javascript" src="/static/js/alerts.js"></script>
+<script type="text/javascript">
+
+    $('.message .close')
+        .on('click', function () {
+            $(this)
+                .closest('.message')
+                .transition('fade')
+                ;
+        })
+        ;
+
+
+    getAllStocks()
+    getAllUserAllerts("{{ user.id }}")
+
+</script>
+
+{% endblock %}
