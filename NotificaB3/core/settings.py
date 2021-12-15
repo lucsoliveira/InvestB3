@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'user',
     'api.apps.ApiConfig',  # necessário para a API
     'alert.apps.AlertConfig',  # necessário para o Alert
+    'stock.apps.StockConfig',  # definição do app Stock
+    'market.apps.MarketConfig',  # definição do app Stock
 ]
 
 MIDDLEWARE = [

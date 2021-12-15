@@ -1,0 +1,76 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<!--segment market-->
+<div class="ui container segment">
+
+    <!--loader-->
+    <div class="ui active inverted dimmer" id="loader-market">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
+
+    <h2 class="ui header">Mercado de Ações</h2>
+
+    <!--search form-->
+    <div class="ui aligned search">
+        <div class="ui icon input fluid">
+            <input class="prompt" type="text" placeholder="Buscar empresa...">
+            <i class="search icon"></i>
+        </div>
+        <div class="results"></div>
+    </div>
+    <!--end search form-->
+
+    <br />
+    <br />
+    <!--table all companies table-->
+    <table id="market-table">
+
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Setor Econômico</th>
+                <th>Opções</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="3">
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+    <!--end all companies table-->
+
+</div>
+<!--end market-->
+
+<center>
+    <a href="/">Voltar para Home >></a>
+</center>
+
+<script type="text/javascript" src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/static/js/market.js"></script>
+<script type="text/javascript">
+
+    $('.message .close')
+        .on('click', function () {
+            $(this)
+                .closest('.message')
+                .transition('fade')
+                ;
+        })
+        ;
+
+
+    getAllStocks()
+
+
+</script>
+{% endblock %}

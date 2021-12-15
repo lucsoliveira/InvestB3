@@ -1,0 +1,257 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+<!--segment stock info-->
+<div class="ui container segment">
+
+    <!--lodaer-->
+    <div class="ui active inverted dimmer" id="loader-stock">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
+
+    <h3 class="ui right floated header">
+
+        {% if alert %}
+        <form method="post" action="{% url 'alert:remove' %}">
+            {% csrf_token %}
+            <input type="hidden" name="id_alert" value="{{ alert.id }}" />
+            <button type="submit" class="ui red basic button">
+                <i class="icon delete"></i>
+                Remover Alerta
+            </button>
+        </form>
+
+        {% else %}
+
+        <button onclick="showConfigAlert()" class="ui yellow basic button">
+            <i class="icon bell"></i>
+            Acompanhar
+        </button>
+
+        {% endif %}
+
+    </h3>
+    <h2 class="ui left floated header">
+        (<span>{{ code }}</span>) <span id="longname"></span>
+        <div class="sub header">Último <b>BRL</b> <b id="actualPrice"></b>. Atualizado em <em id="actualDate"></em>.
+        </div>
+
+    </h2>
+
+    <br />
+    <br />
+    <br />
+
+    <!-- stock notification config -->
+    <div class="ui yellow segment" id="configAlert" style="display: none;">
+
+        <h4 class="ui right yellow header">
+
+            <i class="icon yellow bell"></i> Configuração de notificação
+        </h4>
+
+        <div class="ui form">
+
+            <form method="post" action="{% url 'alert:add' %}">
+                {% csrf_token %}
+                <input type="hidden" name="name_company" />
+                <input type="hidden" name="code" value="{{ code }}" />
+
+                <div class="three fields">
+                    <div class="field">
+                        <label>Intervalo de atualização</label>
+                        <div class="ui right labeled input">
+                            <input type="number" min="1" name="interval_notify" required placeholder="Intervalo"
+                                id="amount">
+                            <div class="ui basic label">m</div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Limite inferior</label>
+                        <div class="ui right labeled input">
+                            <label for="amount" class="ui label">BRL</label>
+                            <input type="number" step="0.01" name="lower_limit" required placeholder="Valor"
+                                id="amount">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Limite superior</label>
+                        <div class="ui right labeled input">
+                            <label for="amount" class="ui label">BRL</label>
+                            <input type="number" step="0.01" name="higher_limit" required placeholder="Valor"
+                                id="amount">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label><br /></label>
+                        <button class="ui fluid positive  button">
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if alert %}
+    <!-- stock notification config -->
+    <div class="ui yellow segment" id="configAlert">
+
+        <h4 class="ui right yellow header">
+
+            <i class="icon yellow bell"></i> Configuração de notificação
+        </h4>
+
+        <div class="ui form">
+
+            <form method="post" action="{% url 'alert:update' %}">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="id_alert" value="{{ alert.id }}" />
+                <input type="hidden" name="name_company" />
+                <input type="hidden" name="code" value="{{ code }}" />
+
+                <div class="three fields">
+                    <div class="field">
+                        <label>Intervalo de atualização</label>
+                        <div class="ui right labeled input">
+                            <input type="number" min="1" name="interval_notify" required
+                                value="{{ alert.interval_notify }}" placeholder="Intervalo" id="interval_notify">
+                            <div class="ui basic label">m</div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Limite inferior</label>
+                        <div class="ui right labeled input">
+                            <label for="amount" class="ui label">BRL</label>
+                            <input type="number" step="0.01" name="lower_limit" value="{{ alert.lower_limit }}" required
+                                placeholder="Valor" id="lower_limit">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Limite superior</label>
+                        <div class="ui right labeled input">
+                            <label for="amount" class="ui label">BRL</label>
+                            <input type="number" step="0.01" name="higher_limit" value="{{ alert.higher_limit }}"
+                                required placeholder="Valor" id="higher_limit">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label><br /></label>
+                        <button class="ui fluid positive  button">
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <!-- end stock notification config-->
+
+    <!--table stock info-->
+    <table class="ui celled padded table">
+        <h4>Informações da ação</h4>
+        <thead>
+            <tr>
+                <th>Fechamento anterior (BRL)</th>
+                <th>Preço de compra (BRL)</th>
+                <th>Preço de venda (BRL)</th>
+                <th>Variação do Dia</th>
+                <th>Estimativa Volume</th>
+                <th>Índice P/L (12 mes.)</th>
+                <th>LPA (12 mes.)</th>
+                <th>Dividendo futuro</th>
+                <th>Rendimento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="regularMarketPreviousClose"></td>
+                <td id="bid"></td>
+                <td id="ask"></td>
+                <td id="regularMarketDayRange"></td>
+                <td id="regularMarketVolume"></td>
+                <td id="trailingPE"></td>
+                <td id="epsTrailingTwelveMonths"></td>
+                <td id="dividendRate"></td>
+                <td id="dividendYield"></td>
+            </tr>
+        </tbody>
+    </table>
+    <!--end table stock info-->
+
+</div>
+<!--end segment stock info-->
+
+<!--segment stock chart-->
+<div class="ui container segment">
+
+
+    <h2 class="ui header">
+
+        <i class="icon chart line"></i> Histórico de preço
+    </h2>
+
+    <!--chart stock price historical-->
+    Aqui ficará o gráfico
+    <!--end chart stock price historical-->
+
+</div>
+<!--end segment stock info-->
+
+<!--segment stock news-->
+<div class="ui container segment">
+
+    <!--loader news-->
+    <div class="ui active inverted dimmer" id="loader-news">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
+
+    <h2 class="ui header">
+
+        <i class="icon chart newspaper"></i> Notícias relacionadas
+    </h2>
+    <!--stock news-->
+
+    <div class="ui relaxed divided list" id="list-news">
+
+        <div class="item">
+            <div class="content">
+                <a href="{{ n.link }}" target="_blank" class="header">{{ n.title }}</a>
+                <div class="description">{{ n.providerPublishTime | date }}</div>
+            </div>
+        </div>
+
+
+    </div>
+    <!--end stock news-->
+
+</div>
+<!--end segment stock info-->
+
+
+{% else %}
+Por favor, logue para ter acesso a essas informações
+{% endif %}
+
+<center>
+    <a href="/">Voltar para Home >></a>
+</center>
+
+<script type="text/javascript" src="/static/js/stock.js"></script>
+<script type="text/javascript">
+
+    getAllQuoteInformation("{{ code }}")
+    getStockNews("{{ code }}")
+</script>
+
+{% endblock %}

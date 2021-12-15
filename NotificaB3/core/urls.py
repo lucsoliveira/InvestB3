@@ -25,7 +25,11 @@ urlpatterns = [
     path('api/', include('api.urls', namespace='api')),
     # favorites, pagina single de uma ação
     path('alert/', include('alert.urls', namespace='alert')),
-    path('', RedirectView.as_view(url='alert/'))
+    path('', RedirectView.as_view(url='alert/')),
+    # stocks, pagina single de uma ação
+    path('stock/', include('stock.urls', namespace='stock')),
+    # mercado de ações com listagem para adicionar aos favoritos
+    path('market/', include('market.urls')),
 
 
 ]
