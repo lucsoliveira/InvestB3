@@ -1,10 +1,8 @@
 import http.client
 import json
 
-from django.shortcuts import render
 from alert.models import Alert
 from django.http import JsonResponse
-
 from django.conf import settings
 
 # Yahoo Finances API Key
@@ -106,6 +104,36 @@ def getStockNews(request):
         # só é possivel obter estes dados se o usuário estiver logado
         return JsonResponse({'error': 'Não foi possível obter os dados.'}, status=404, safe=isSafe)
 
+# stock - news - get
+
+
+def getStockChart(request):
+
+    code = request.GET.get('code')
+
+    if request.user.id:
+
+        if (code is None):
+
+            # só é possivel obter estes dados se o usuário estiver logado
+            return JsonResponse({'error': 'Não foi possível obter os dados.'}, status=404, safe=isSafe)
+
+        else:
+
+            # get data from API
+
+            conn = http.client.HTTPSConnection(settings.URL_SERVER_API)
+            conn.request("GET", "/stock/v3/get-chart?interval=1mo&symbol=" + code +
+                         ".SA&range=5y&region=BR&includePrePost=false&useYfid=true&includeAdjustedClose=true&events=capitalGain%2Cdiv%2Csplit", headers=settings.HEADERS_API)
+            res = conn.getresponse()
+            data = res.read()
+            conn.close()
+
+            return JsonResponse({"code": code, 'chart': json.loads(data.decode("utf-8"))['chart']}, status=201, safe=isSafe)
+
+    else:
+        # só é possivel obter estes dados se o usuário estiver logado
+        return JsonResponse({'error': 'Não foi possível obter os dados.'}, status=404, safe=isSafe)
 
 # stock - single - quotes - price
 

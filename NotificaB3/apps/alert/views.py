@@ -1,27 +1,17 @@
-import json
-
-from typing import Reversible
-from django.http import request
 from django.http.response import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-
+from django.shortcuts import render
+from .models import Alert
 from .forms import RemoveAlertForm, AddAlertForm, UpdateAlertForm
-
-from .models import Alert, User
-
 from django.conf import settings
 from notificator.jobs import notificator
 
 
 def index(request):
     """View da pagina alertas"""
-
-    # get all user's alert
     context = {
-        'user': request.user,
+        'title_site': 'Meus Alertas | NotificaB3 - Desafio INOA'
     }
-
-    return render(request, 'alert/index.html')
+    return render(request, 'alert/index.html', context=context)
 
 
 def add(request):

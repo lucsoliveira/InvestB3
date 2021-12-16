@@ -22,7 +22,7 @@ function getAllQuoteInformation(code) {
 
         var quote = []
 
-        if (response) {
+        if (response.quoteResponse.result.length > 0 && response.quoteResponse.result[0].quoteType != 'NONE') {
 
             let res = response.quoteResponse.result[0]
 
@@ -49,6 +49,16 @@ function getAllQuoteInformation(code) {
 
             //update forms values
             document.getElementsByName("name_company").value = quote[9].value
+
+        } else {
+
+            //after all, hide the loader
+            document.getElementById("stock-info").style.display = 'none'
+            document.getElementById("stock-chart").style.display = 'none'
+            document.getElementById("stock-news").style.display = 'none'
+
+            document.getElementById("msg-error-stock").style.display = 'block'
+
         }
 
 
@@ -76,21 +86,27 @@ function getStockNews(code) {
 
         if (response) {
 
-            console.log(response)
             news = response.news
 
-            for (let i = 0; i < news.length; i++) {
+            if (news.length == 0) {
 
-                //date news from api is in timestamp, for this we have to multiply by 1000
-                let dateFormated = new Date(news[i].providerPublishTime * 1000)
+                document.getElementById("stock-news").style.display = 'none'
 
-                var listString = '<div class="item">';
-                listString += '<div class="content">';
-                listString += '<a href="' + news[i].link + '" target="_blank" class="header">' + news[i].title + ' </a><div class="description">' + dateFormated.toLocaleDateString() + '</div>';
-                listString += "</div></div>";
+            } else {
 
-                $('#list-news').append(listString);
+                for (let i = 0; i < news.length; i++) {
 
+                    //date news from api is in timestamp, for this we have to multiply by 1000
+                    let dateFormated = new Date(news[i].providerPublishTime * 1000)
+
+                    var listString = '<div class="item">';
+                    listString += '<div class="content">';
+                    listString += '<a href="' + news[i].link + '" target="_blank" class="header">' + news[i].title + ' </a><div class="description">' + dateFormated.toLocaleDateString() + '</div>';
+                    listString += "</div></div>";
+
+                    $('#list-news').append(listString);
+
+                }
             }
         }
         //after all, hide the loader
@@ -98,4 +114,140 @@ function getStockNews(code) {
 
     });
 
+}
+
+function getChart(code) {
+
+
+    //get chart data from api
+    const settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "/api/stock/chart/get/?code=" + code,
+        "method": "GET"
+    };
+
+    $.ajax(settings).done(function (response) {
+
+        chart_res = response.chart.result
+
+        if (chart_res.length > 0) {
+
+            timestamp = chart_res[0].timestamp
+            close_quote = chart_res[0].indicators.quote[0].close
+            /*
+            high_quote = chart_res[0].timestamp
+            low_quote = chart_res[0].timestamp
+            open_quote = chart_res[0].timestamp
+            volume_quote = chart_res[0].timestamp
+            */
+            var options = {
+                chart: {
+                    type: "area",
+                    height: 300,
+                    foreColor: "#999",
+                    stacked: true,
+                    /*
+                    dropShadow: {
+                        enabled: true,
+                        enabledSeries: [0],
+                        top: -2,
+                        left: 2,
+                        blur: 5,
+                        opacity: 0.06
+                    }*/
+                },
+                colors: ['#00E396'],
+                stroke: {
+                    curve: "smooth",
+                    width: 3
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Valor (BRL)',
+                    data: generateDayWiseTimeSeries(close_quote, timestamp)
+                }],
+                markers: {
+                    size: 0,
+                    strokeColor: "#fff",
+                    strokeWidth: 3,
+                    strokeOpacity: 1,
+                    fillOpacity: 1,
+                    hover: {
+                        size: 6
+                    }
+                },
+                xaxis: {
+                    type: "datetime",
+                    axisBorder: {
+                        show: false
+                    },
+                    axisTicks: {
+                        show: false
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        offsetX: 14,
+                        offsetY: -5
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    title: {
+                        text: 'Valor (BRL)'
+                    },
+                },
+                grid: {
+                    padding: {
+                        left: -5,
+                        right: 5
+                    }
+                },
+                tooltip: {
+                    x: {
+                        format: "dd MMM yyyy"
+                    },
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left'
+                },
+                fill: {
+                    fillOpacity: 0.2
+                },
+
+                defaultLocale: "br"
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+
+
+        } else {
+
+            //after all, hide the loader
+            document.getElementById("stock-chart").style.display = 'none'
+
+        }
+
+
+        //after all, hide the loader
+        document.getElementById("loader-chart").style.display = 'none'
+
+    });
+
+
+}
+
+function generateDayWiseTimeSeries(values, timestamp) {
+
+    var series = [];
+    for (i = 0; i < values.length; i++) {
+
+        series.push([new Date(timestamp[i] * 1000), values[i].toFixed(2)]);
+    }
+    return series;
 }

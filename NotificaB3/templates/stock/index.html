@@ -4,226 +4,252 @@
 
 {% if user.is_authenticated %}
 
+<!--segment breadcrumb-->
+<div class="ui container segment">
+    <div class="ui small breadcrumb">
+        <a class="section" href="/">Home</a>
+        <i class="right chevron icon divider"></i>
+        <a class="section">Ação</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">{{ code }}</div>
+    </div>
+</div>
+<!--end segment breadcrumb-->
+
 <!--segment stock info-->
 <div class="ui container segment">
 
-    <!--lodaer-->
-    <div class="ui active inverted dimmer" id="loader-stock">
-        <div class="ui text loader">Carregando...</div>
+    <!--message-->
+    <div class="ui warning message" id="msg-error-stock" style="display: none;">
+        <!--<i class="close icon"></i>-->
+        <div class="header">
+            Ops! Empresa não encontrada.
+        </div>
+        Infelizmente não conseguimos localizar dados da empresa buscada. Tente novamente mais tarde ou entre em contato
+        com um de nossos atendentes.
     </div>
-    <!--end loader-->
+    <!--end message-->
 
-    <h3 class="ui right floated header">
+    <div id="stock-info">
+
+        <!--lodaer-->
+        <div class="ui active inverted dimmer" id="loader-stock">
+            <div class="ui text loader">Carregando...</div>
+        </div>
+        <!--end loader-->
+
+        <h3 class="ui right floated header">
+
+            {% if alert %}
+            <form method="post" action="{% url 'alert:remove' %}">
+                {% csrf_token %}
+                <input type="hidden" name="id_alert" value="{{ alert.id }}" />
+                <button type="submit" class="ui red basic button">
+                    <i class="icon delete"></i>
+                    Remover Alerta
+                </button>
+            </form>
+
+            {% else %}
+
+            <button onclick="showConfigAlert()" class="ui yellow basic button">
+                <i class="icon bell"></i>
+                Acompanhar
+            </button>
+
+            {% endif %}
+
+        </h3>
+        <h2 class="ui left floated header">
+            (<span>{{ code }}</span>) <span id="longname"></span>
+            <div class="sub header">Último <b>BRL</b> <b id="actualPrice"></b>. Atualizado em <em id="actualDate"></em>.
+            </div>
+
+        </h2>
+
+        <br />
+        <br />
+        <br />
+
+        <!-- stock notification config -->
+        <div class="ui yellow segment" id="configAlert" style="display: none;">
+
+            <h4 class="ui right yellow header">
+
+                <i class="icon yellow bell"></i> Configuração de notificação
+            </h4>
+
+            <div class="ui form">
+
+                <form method="post" action="{% url 'alert:add' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="name_company" />
+                    <input type="hidden" name="code" value="{{ code }}" />
+
+                    <div class="three fields">
+                        <div class="field">
+                            <label>Intervalo de atualização</label>
+                            <div class="ui right labeled input">
+                                <input type="number" min="1" name="interval_notify" required placeholder="Intervalo"
+                                    id="amount">
+                                <div class="ui basic label">m</div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Limite inferior</label>
+                            <div class="ui right labeled input">
+                                <label for="amount" class="ui label">BRL</label>
+                                <input type="number" step="0.01" name="lower_limit" required placeholder="Valor"
+                                    id="amount">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Limite superior</label>
+                            <div class="ui right labeled input">
+                                <label for="amount" class="ui label">BRL</label>
+                                <input type="number" step="0.01" name="higher_limit" required placeholder="Valor"
+                                    id="amount">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label><br /></label>
+                            <button class="ui fluid positive  button">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         {% if alert %}
-        <form method="post" action="{% url 'alert:remove' %}">
-            {% csrf_token %}
-            <input type="hidden" name="id_alert" value="{{ alert.id }}" />
-            <button type="submit" class="ui red basic button">
-                <i class="icon delete"></i>
-                Remover Alerta
-            </button>
-        </form>
+        <!-- stock notification config -->
+        <div class="ui yellow segment" id="configAlert">
 
-        {% else %}
+            <h4 class="ui right yellow header">
 
-        <button onclick="showConfigAlert()" class="ui yellow basic button">
-            <i class="icon bell"></i>
-            Acompanhar
-        </button>
+                <i class="icon yellow bell"></i> Configuração de notificação
+            </h4>
 
+            <div class="ui form">
+
+                <form method="post" action="{% url 'alert:update' %}">
+
+                    {% csrf_token %}
+
+                    <input type="hidden" name="id_alert" value="{{ alert.id }}" />
+                    <input type="hidden" name="name_company" />
+                    <input type="hidden" name="code" value="{{ code }}" />
+
+                    <div class="three fields">
+                        <div class="field">
+                            <label>Intervalo de atualização</label>
+                            <div class="ui right labeled input">
+                                <input type="number" min="1" name="interval_notify" required
+                                    value="{{ alert.interval_notify }}" placeholder="Intervalo" id="interval_notify">
+                                <div class="ui basic label">m</div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Limite inferior</label>
+                            <div class="ui right labeled input">
+                                <label for="amount" class="ui label">BRL</label>
+                                <input type="number" step="0.01" name="lower_limit" value="{{ alert.lower_limit }}"
+                                    required placeholder="Valor" id="lower_limit">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Limite superior</label>
+                            <div class="ui right labeled input">
+                                <label for="amount" class="ui label">BRL</label>
+                                <input type="number" step="0.01" name="higher_limit" value="{{ alert.higher_limit }}"
+                                    required placeholder="Valor" id="higher_limit">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label><br /></label>
+                            <button class="ui fluid positive  button">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         {% endif %}
+        <!-- end stock notification config-->
 
-    </h3>
-    <h2 class="ui left floated header">
-        (<span>{{ code }}</span>) <span id="longname"></span>
-        <div class="sub header">Último <b>BRL</b> <b id="actualPrice"></b>. Atualizado em <em id="actualDate"></em>.
-        </div>
-
-    </h2>
-
-    <br />
-    <br />
-    <br />
-
-    <!-- stock notification config -->
-    <div class="ui yellow segment" id="configAlert" style="display: none;">
-
-        <h4 class="ui right yellow header">
-
-            <i class="icon yellow bell"></i> Configuração de notificação
-        </h4>
-
-        <div class="ui form">
-
-            <form method="post" action="{% url 'alert:add' %}">
-                {% csrf_token %}
-                <input type="hidden" name="name_company" />
-                <input type="hidden" name="code" value="{{ code }}" />
-
-                <div class="three fields">
-                    <div class="field">
-                        <label>Intervalo de atualização</label>
-                        <div class="ui right labeled input">
-                            <input type="number" min="1" name="interval_notify" required placeholder="Intervalo"
-                                id="amount">
-                            <div class="ui basic label">m</div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Limite inferior</label>
-                        <div class="ui right labeled input">
-                            <label for="amount" class="ui label">BRL</label>
-                            <input type="number" step="0.01" name="lower_limit" required placeholder="Valor"
-                                id="amount">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Limite superior</label>
-                        <div class="ui right labeled input">
-                            <label for="amount" class="ui label">BRL</label>
-                            <input type="number" step="0.01" name="higher_limit" required placeholder="Valor"
-                                id="amount">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label><br /></label>
-                        <button class="ui fluid positive  button">
-                            Salvar
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+        <!--table stock info-->
+        <table class="ui celled padded table">
+            <h4>Informações da ação</h4>
+            <thead>
+                <tr>
+                    <th>Fechamento anterior (BRL)</th>
+                    <th>Preço de mercado (BRL)</th>
+                    <th>Preço de compra (BRL)</th>
+                    <th>Preço de venda (BRL)</th>
+                    <th>Variação do Dia</th>
+                    <th>Estimativa Volume</th>
+                    <th>Índice P/L (12 mes.)</th>
+                    <th>LPA (12 mes.)</th>
+                    <th>Dividendo futuro</th>
+                    <th>Rendimento</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="regularMarketPreviousClose"></td>
+                    <td id="regularMarketPrice"></td>
+                    <td id="bid"></td>
+                    <td id="ask"></td>
+                    <td id="regularMarketDayRange"></td>
+                    <td id="regularMarketVolume"></td>
+                    <td id="trailingPE"></td>
+                    <td id="epsTrailingTwelveMonths"></td>
+                    <td id="dividendRate"></td>
+                    <td id="dividendYield"></td>
+                </tr>
+            </tbody>
+        </table>
+        <!--end table stock info-->
     </div>
-
-    {% if alert %}
-    <!-- stock notification config -->
-    <div class="ui yellow segment" id="configAlert">
-
-        <h4 class="ui right yellow header">
-
-            <i class="icon yellow bell"></i> Configuração de notificação
-        </h4>
-
-        <div class="ui form">
-
-            <form method="post" action="{% url 'alert:update' %}">
-
-                {% csrf_token %}
-
-                <input type="hidden" name="id_alert" value="{{ alert.id }}" />
-                <input type="hidden" name="name_company" />
-                <input type="hidden" name="code" value="{{ code }}" />
-
-                <div class="three fields">
-                    <div class="field">
-                        <label>Intervalo de atualização</label>
-                        <div class="ui right labeled input">
-                            <input type="number" min="1" name="interval_notify" required
-                                value="{{ alert.interval_notify }}" placeholder="Intervalo" id="interval_notify">
-                            <div class="ui basic label">m</div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Limite inferior</label>
-                        <div class="ui right labeled input">
-                            <label for="amount" class="ui label">BRL</label>
-                            <input type="number" step="0.01" name="lower_limit" value="{{ alert.lower_limit }}" required
-                                placeholder="Valor" id="lower_limit">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label>Limite superior</label>
-                        <div class="ui right labeled input">
-                            <label for="amount" class="ui label">BRL</label>
-                            <input type="number" step="0.01" name="higher_limit" value="{{ alert.higher_limit }}"
-                                required placeholder="Valor" id="higher_limit">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label><br /></label>
-                        <button class="ui fluid positive  button">
-                            Salvar
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% endif %}
-    <!-- end stock notification config-->
-
-    <!--table stock info-->
-    <table class="ui celled padded table">
-        <h4>Informações da ação</h4>
-        <thead>
-            <tr>
-                <th>Fechamento anterior (BRL)</th>
-                <th>Preço de mercado (BRL)</th>
-                <th>Preço de compra (BRL)</th>
-                <th>Preço de venda (BRL)</th>
-                <th>Variação do Dia</th>
-                <th>Estimativa Volume</th>
-                <th>Índice P/L (12 mes.)</th>
-                <th>LPA (12 mes.)</th>
-                <th>Dividendo futuro</th>
-                <th>Rendimento</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td id="regularMarketPreviousClose"></td>
-                <td id="regularMarketPrice"></td>
-                <td id="bid"></td>
-                <td id="ask"></td>
-                <td id="regularMarketDayRange"></td>
-                <td id="regularMarketVolume"></td>
-                <td id="trailingPE"></td>
-                <td id="epsTrailingTwelveMonths"></td>
-                <td id="dividendRate"></td>
-                <td id="dividendYield"></td>
-            </tr>
-        </tbody>
-    </table>
-    <!--end table stock info-->
-
 </div>
 <!--end segment stock info-->
 
 <!--segment stock chart-->
-<div class="ui container segment">
-
+<div class="ui container segment" id="stock-chart">
 
     <h2 class="ui header">
-
         <i class="icon chart line"></i> Histórico de preço
     </h2>
 
+    <!--loader news-->
+    <div class="ui active inverted dimmer" id="loader-chart">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
+
     <!--chart stock price historical-->
-    Aqui ficará o gráfico
+    <div id="chart"></div>
     <!--end chart stock price historical-->
 
 </div>
 <!--end segment stock info-->
 
 <!--segment stock news-->
-<div class="ui container segment">
+<div class="ui container segment" id="stock-news">
 
+    <h2 class="ui header">
+        <i class="icon chart newspaper"></i> Notícias relacionadas
+    </h2>
     <!--loader news-->
     <div class="ui active inverted dimmer" id="loader-news">
         <div class="ui text loader">Carregando...</div>
     </div>
     <!--end loader-->
-
-    <h2 class="ui header">
-
-        <i class="icon chart newspaper"></i> Notícias relacionadas
-    </h2>
-    <!--stock news-->
-
+    <!--list stock news-->
     <div class="ui relaxed divided list" id="list-news">
 
         <div class="item">
@@ -249,11 +275,14 @@ Por favor, logue para ter acesso a essas informações
     <a href="/">Voltar para Home >></a>
 </center>
 
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script type="text/javascript" src="/static/js/stock.js"></script>
 <script type="text/javascript">
 
     getAllQuoteInformation("{{ code }}")
     getStockNews("{{ code }}")
+    getChart("{{ code }}")
+
 </script>
 
 {% endblock %}

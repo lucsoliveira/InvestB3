@@ -1,8 +1,22 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+
+<!--segment breadcrumb-->
+<div class="ui container segment">
+    <div class="ui small breadcrumb">
+        <a class="section" href="/">Home</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">Mercado de Ações</div>
+    </div>
+</div>
+<!--end segment breadcrumb-->
+
 <!--segment market-->
 <div class="ui container segment">
+
+
+    <h2 class="ui header">Mercado de Ações</h2>
 
     <!--loader-->
     <div class="ui active inverted dimmer" id="loader-market">
@@ -10,9 +24,7 @@
     </div>
     <!--end loader-->
 
-    <h2 class="ui header">Mercado de Ações</h2>
-
-    <!--search form-->
+    <!--
     <div class="ui aligned search">
         <div class="ui icon input fluid">
             <input class="prompt" type="text" placeholder="Buscar empresa...">
@@ -20,7 +32,7 @@
         </div>
         <div class="results"></div>
     </div>
-    <!--end search form-->
+    search form-->
 
     <br />
     <br />

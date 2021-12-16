@@ -13,8 +13,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import sys
 import os
 import environ
+import pytz
+
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -152,7 +155,13 @@ HEADERS_API = {
 }
 
 # necessário para o processamento em background
-SCHEDULER = BackgroundScheduler()
+# referente aos dias de abertura e fechamento da B3
+DAY_OF_WEEK_SCHEDULER = [0, 1, 2, 3, 4]  # 0: Monday
+HOUR_OPEN_CLOSE_MARKET_SCHEDULER = [10, 18]
+# intervalo de envio entre um email de notificação e outro
+EMAIL_INTERVAL_SCHEDULER = 30
+SP_TIMEZONE = pytz.timezone("America/Sao_Paulo")
+SCHEDULER = BackgroundScheduler(timezone=SP_TIMEZONE)
 
 # necessário para o envio de emails
 # para printar o email no console: EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -162,6 +171,6 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 # para usar dessa forma, é necessário ativar o "less secure app access" de seu provedor de email
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
-EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-EMAIL_USE_SSL = env('EMAIL_USE_SSL')
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'default from email'

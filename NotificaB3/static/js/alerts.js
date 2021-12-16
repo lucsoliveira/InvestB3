@@ -25,6 +25,9 @@ function getAllStocks() {
                     stocks.push({ category: response[i].setor_economico, title: response[i].cd_acao })
                 }
             }
+
+
+            document.getElementById("loader-search-form").style.display = 'none'
         }
 
         //search form get all data
@@ -40,6 +43,8 @@ function getAllStocks() {
                 }
             })
             ;
+
+
 
     });
 
@@ -59,17 +64,23 @@ function getAllUserAllerts(idUser) {
         if (response) {
             alerts = response.alerts
 
-            for (i = 0; i < alerts.length; i++) {
-                var tableString = "<tr>";
-                tableString += "<td> <h3 class='ui center aligned header'>" + alerts[i].code + "</h3></td>";
-                tableString += "<td>" + alerts[i].actualPrice + "</td>";
-                tableString += "<td>" + alerts[i].lower_limit + "</td>";
-                tableString += "<td>" + alerts[i].higher_limit + "</td>";
-                tableString += "<td>" + alerts[i].interval_notify + "</td>";
-                tableString += "<td><center><div class='ui icon buttons'><a href='../stock/?q=" + alerts[i].code + "'><button class='ui button'><i class='edit icon'></i></button></a> </div></center></td>";
-                tableString += "</tr>";
+            if (response.alerts.length == 0) {
+                document.getElementById("my-alerts").style.display = 'none'
+                document.getElementById("msg-no-alerts").style.display = 'block'
+            } else {
 
-                $('table tbody').append(tableString);
+                for (i = 0; i < alerts.length; i++) {
+                    var tableString = "<tr>";
+                    tableString += "<td> <h3 class='ui center aligned header'>" + alerts[i].code + "</h3></td>";
+                    tableString += "<td>" + alerts[i].actualPrice + "</td>";
+                    tableString += "<td>" + alerts[i].lower_limit + "</td>";
+                    tableString += "<td>" + alerts[i].higher_limit + "</td>";
+                    tableString += "<td>" + alerts[i].interval_notify + "</td>";
+                    tableString += "<td><center><div class='ui icon buttons'><a href='../stock/?q=" + alerts[i].code + "'><button class='ui button'><i class='edit icon'></i></button></a> </div></center></td>";
+                    tableString += "</tr>";
+
+                    $('table tbody').append(tableString);
+                }
             }
 
         }

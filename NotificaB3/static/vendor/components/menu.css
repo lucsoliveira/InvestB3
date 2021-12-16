@@ -1789,6 +1789,7 @@ Floated Menu / Item
   left: 0px;
   right: auto;
   bottom: auto;
+  background-color: rgb(13, 0, 142);
 }
 .ui[class*="top fixed"].menu {
   border-top: none;

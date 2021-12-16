@@ -7,6 +7,7 @@ urlpatterns = [
     # Stock
     path('stock/get/', views.getStock, name='getStock'),
     path('stock/news/get/', views.getStockNews, name='getStockNews'),
+    path('stock/chart/get/', views.getStockChart, name='getStockChart'),
     path('stock/quotes/get/', views.getStockQuotes, name='getStockQuotes'),
     path('stock/quotes/price/get/', views.getStockQuotesPrice,
          name='getStockQuotesPrice'),

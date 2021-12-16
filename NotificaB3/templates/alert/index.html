@@ -2,12 +2,26 @@
 
 {% block content %}
 
-
-
 {% if user.is_authenticated %}
+
+<!--segment breadcrumb-->
+<div class="ui container segment">
+    <div class="ui small breadcrumb">
+        <a class="section" href="/">Home</a>
+        <i class="right chevron icon divider"></i>
+        <div class="active section">Meus Alertas</div>
+    </div>
+</div>
+<!--end segment breadcrumb-->
+
 <!-- segment search-->
 <div class="ui container segment">
     <h2 class="ui left  header">Buscar Ação</h2>
+    <!--loader-->
+    <div class="ui active inverted dimmer" id="loader-search-form">
+        <div class="ui text loader">Carregando...</div>
+    </div>
+    <!--end loader-->
     <!--search form-->
     <form method="get" action="/stock">
         <div class="ui aligned search">
@@ -29,8 +43,6 @@
 
     <h2 class="ui left  header">Meus Alertas</h2>
 
-
-
     {% if user.is_authenticated %}
 
     <!--lodaer-->
@@ -40,7 +52,7 @@
     <!--end loader-->
 
     <!--table my alerts-->
-    <table class="ui celled padded table">
+    <table class="ui celled padded table" id="my-alerts">
         <thead>
             <tr>
                 <th>Código</th>
@@ -53,37 +65,18 @@
             </tr>
         </thead>
 
+        <!--all alerts-->
+        <!--message-->
+        <div class="ui warning message" id="msg-no-alerts" style="display: none;">
+            <!--<i class="close icon"></i>-->
+            <div class="header">
+                Você ainda não tem nenhuma empresa sendo monitorada
+            </div>
+            Comece buscando uma ação no campo de busca acima e adicione uma notificação para ela.
+        </div>
+
+        <!--end message-->
         <tbody>
-
-            {% for item in alerts %}
-            <tr>
-                <td>
-                    <h3 class="ui center aligned header"> {{ item.code }}
-                    </h3>
-                </td>
-                <td>xx</td>
-                <td>{{ item.lower_limit }}</td>
-                <td>{{ item.higher_limit }}</td>
-                <td>{{ item.interval_notify }}</td>
-
-                <td>
-                    <center>
-                        <div class="ui icon buttons">
-
-                            <a href="../stock/?q={{ item.code }}">
-                                <button class="ui button"><i class="edit icon"></i></button>
-                            </a>
-
-                            <button class="ui button"><i class="delete icon"></i></button>
-
-                        </div>
-                    </center>
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
         </tbody>
 
         <!---->

@@ -3,15 +3,6 @@ import json
 
 from django.shortcuts import render
 from alert.models import Alert
-from django.http import HttpResponse
-
-# Create your views here.
-# conexão com a API
-conn = http.client.HTTPSConnection("yh-finance.p.rapidapi.com")
-headers = {
-    'x-rapidapi-host': "yh-finance.p.rapidapi.com",
-    'x-rapidapi-key': "9efcbecc6dmsh53d821d294f159dp1e0906jsn3e1bae122453"
-}
 
 
 def index(request):
@@ -27,16 +18,26 @@ def singleStock(request):
 
     # get data from API
 
-    context = {
-        'code': code,
-    }
+    if code:
 
-    # verify if this stock is alert
-    try:
-        context['alert'] = Alert.objects.get(
-            user_id=request.user.id, code=code)
+        context = {
+            'code': code,
+            'title_site': code + '| NotificaB3 - Desafio INOA'
+        }
 
-    except Alert.DoesNotExist:
-        pass
+        # verify if this stock is alert
+        try:
+            context['alert'] = Alert.objects.get(
+                user_id=request.user.id, code=code)
 
-    return render(request, 'stock/index.html', context=context)
+        except Alert.DoesNotExist:
+            pass
+
+        return render(request, 'stock/index.html', context=context)
+
+    else:
+
+        context = {
+            'title_site': 'Ação não encontrada | NotificaB3 - Desafio INOA'
+        }
+        return render(request, 'stock/index.html', context=context)

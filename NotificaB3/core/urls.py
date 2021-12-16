@@ -31,5 +31,4 @@ urlpatterns = [
     # mercado de ações com listagem para adicionar aos favoritos
     path('market/', include('market.urls')),
 
-
 ]
