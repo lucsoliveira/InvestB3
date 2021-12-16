@@ -1,5 +1,3 @@
-# NotificaB3
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -12,18 +10,12 @@
 <!-- PROJECT LOGO -->
 <br />
 
-<p align="center">
-  <a href="https://github.com/lucsoliveira/NotificaB3">
-    <img src="./NotificaB3/static/images/big_no_bg_logo.png" alt="Logo" width="300">
-  </a>
+   <h1 align="center">
+       NotificaB3
+</h1>
   <p align="center">
     Sistema de notificação de oportunidades de negociação de ações da B3: receba notificações em seu email sobre o preço de suas ações favoritas com valores de compra e venda desejados.
-    <br />
-    <a href="https://github.com/lucsoliveira/NotificaB3"><strong>Read the docs!</strong></a>
-    <br />
   </p>
-
-</p>
 
 <!-- TABLE OF CONTENTS -->
 
@@ -41,6 +33,7 @@
       <ul>
         <li><a href="#prerequisites">Pré requisitos</a></li>
         <li><a href="#installation">Instalação</a></li>
+        <li><a href="#understanding">Entendendo o código</a></li>
       </ul>
     </li>
     <li><a href="#usage">Uso</a></li>
@@ -49,6 +42,7 @@
     <li><a href="#acknowledgements">Créditos</a></li>
   </ol>
 </details>
+
 <!-- ABOUT THE PROJECT -->
 <a id="about-the-project"></a>
 
@@ -75,7 +69,7 @@ Abaixo é possível observar uma imagem da tela "stock", onde contém informaç�
 
 Um exemplo de email de notificação de compra:
 ```sh
-[ASSUNTO] [NOTIFICAB3] Compra a ação: XXXX
+[ASSUNTO] [NOTIFICAB3] Compre a ação: XXXX
 [MENSAGEM] Olá, Lucas! 
 Essa é uma mensagem de aviso para compra da ação: XXXX. 
 O Valor atual dela está em: (BRL) 9.91 e seu limite para compra foi de: (BRL) 10.0 .
@@ -160,6 +154,20 @@ EMAIL_USE_TLS=True
 Para a parte da API dos dados de ações da B3, é necessário configurar o "URL_SERVER_API_KEY". Você pode obter uma chave *freemium* dessa API clicando [aqui](https://rapidapi.com/apidojo/api/yahoo-finance1/). Após colocar sua chave da API Yahoo Finances, é necessário realizar a configuração dos parâmetros para envio de email. Em caso de dúvidas, você pode acessar este tutorial (caso use o gmail): [Fazer login com senhas de app - Ajuda da Conta do Google](https://support.google.com/accounts/answer/185833?hl=pt-BR)
 
 Por fim, basta salvar o arquivo como ".env" somente, dentro da pasta "core".
+
+### Entendendo o código
+
+O sistema foi dividido em uma aplicação central, chamada "Core", e várias outras aplicações (todas estas dentro da pasta "./apps"). Eis a funcionalidade de cada uma das aplicações:
+
+* Core: aplicação central que contem os arquivos principais do sistema: settings.py, .env e urls.py;
+* Alert: aplicação que possui a view da página "Meus Alertas" e chama a funcionalidade em background da aplicação "Notificator";
+* Notificator: aplicação que roda em background e executa as rotinas de notificação de negociação de ações na B3; as rotinas de notificação estão presentes no arquivo "jobs.py";
+* Market: aplicação que contém a view "Market", onde está presente uma tabela dinâmica que faz uma listagem das ações da B3 e seus respectivos setores;
+* Stock: aplicação com a view "Stock Single" onde, através da comunicação com a aplicação API, faz uma listagem de todos os dados da ação, além de trazer um gráfico com o histórico de até 5 anos do preço de uma ação. Nessa view também há um módulo de criação de uma notificação (formulário com inputs);
+* API: aplicação que faz a comunicação com a API do Yahoo Finances e uma API pública para listagem das ações da B3. Suas views retornam valores do tipo JSON.
+* User: aplicação que faz uso da biblitoeca de autenticação padrão do Django para obtenção e manipulação de usuários.
+
+Os templates das views estão na pasta "templates" e os arquivos .js para tornar as views mais dinâmicas estão na pasta "static".
 
 <!-- USAGE -->
 <a id="usage"></a>
