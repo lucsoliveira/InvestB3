@@ -1,8 +1,9 @@
 import datetime
 from django.db import models
 from django.contrib.auth.models import User
-
+from datetime import datetime, timedelta
 # Create your models here.
+d = datetime.today() - timedelta(hours=0, minutes=50)
 
 
 class Alert(models.Model):
@@ -13,4 +14,5 @@ class Alert(models.Model):
     higher_limit = models.FloatField()
     lower_limit = models.FloatField()
     sync = models.BooleanField(default=False)
-    last_notification = models.DateTimeField(auto_now=True)
+    last_notification = models.DateTimeField(
+        auto_now=False, default=d.isoformat())

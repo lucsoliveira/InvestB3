@@ -41,14 +41,15 @@ def notificator(*args):
 
                 # get actual price
                 actual_price = get_stock_actual_price(stock)
-                #actual_price = 12
+                # actual_price = 12
 
                 # 0 to sell - 1 to buy
                 if actual_price <= lower_limit:
 
                     # verify the last notification
-                    if verify_last_notify(last_notification) == 1:
+                    if verify_last_notify(last_notification) != 0:
 
+                        print('enviou email')
                         change_last_notification(args[0])
                         send_email(user_id, stock,
                                    actual_price, lower_limit, 1)
@@ -56,8 +57,8 @@ def notificator(*args):
                 if actual_price >= higher_limit:
 
                     # verify the last notification
-                    if verify_last_notify(last_notification) == 1:
-
+                    if verify_last_notify(last_notification) != 0:
+                        print('enviou email')
                         change_last_notification(args[0])
                         send_email(user_id, stock, actual_price,
                                    higher_limit, 0)
@@ -67,10 +68,13 @@ def notificator(*args):
 
 def verify_last_notify(last):
 
+    print('entrou no verify')
+    print('last>>', last)
     last = dt.datetime.fromisoformat(str(last))
     actual = dt.datetime.today()
 
-    hour_last = last.hour - 2
+    print('actual>>', actual)
+    hour_last = last.hour
     hour_actual = actual.hour
 
     minutes_last = last.minute
@@ -79,6 +83,7 @@ def verify_last_notify(last):
     if hour_actual > hour_last:
 
         # change the last notify
+        print('Maior que uma hora, enviar')
         return 1
 
     else:
@@ -88,15 +93,18 @@ def verify_last_notify(last):
         if diff_minutes >= settings.EMAIL_INTERVAL_SCHEDULER:
 
             # change the last notify
+            print('Maior que uma 30, enviar')
             return 1
         else:
+
+            print('Não enviar')
             return 0
 
 
 def change_last_notification(alert):
 
     a = Alert.objects.get(id=alert.id)
-    a.last_notification = dt.datetime.today
+    a.last_notification = dt.datetime.now().isoformat()
     a.save()
 
     # change the last notification in the job
